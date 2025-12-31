@@ -1,0 +1,172 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5" style="max-width: 500px">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h4 class="mb-0">
+                <i class="bi bi-shield-lock"></i> IUE Syllabus Management System
+            </h4>
+            <small class="text-light">OAuth/EKOID Login Simulation</small>
+        </div>
+        
+        <div class="card-body p-4">
+            <!-- OAuth Simulation Notice -->
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Simulation Mode:</strong> This simulates the university's OAuth/EKOID authentication system.
+                In production, users would be redirected to the central IUE login page.
+            </div>
+
+            <!-- EKOID Login Form -->
+            <form asp-action="Login" method="post" id="loginForm">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-person-badge text-primary"></i> EKOID (Username)
+                    </label>
+                    <input type="text" 
+                           name="ekoid" 
+                           id="ekoidInput"
+                           class="form-control form-control-lg" 
+                           placeholder="Enter your EKOID (e.g., kaya.oguz)"
+                           autocomplete="username"
+                           required />
+                    <div class="form-text">
+                        <i class="bi bi-lightbulb text-warning"></i>
+                        Try: <code>kaya.oguz</code>, <code>kutluhan.erol</code>, or <code>sinan.sener</code>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-key text-primary"></i> Password
+                    </label>
+                    <input type="password" 
+                           name="password"
+                           class="form-control form-control-lg" 
+                           placeholder="(Any password works for simulation)"
+                           autocomplete="current-password" />
+                    <div class="form-text text-muted">
+                        Password is not validated in simulation mode.
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Sign in with EKOID
+                    </button>
+                </div>
+
+                @if (TempData["LoginError"] != null)
+                {
+                    <div class="alert alert-danger mt-3 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @TempData["LoginError"]
+                    </div>
+                }
+            </form>
+
+            <hr class="my-4">
+
+            <!-- Quick Access Buttons -->
+            <div class="mb-3">
+                <p class="text-muted text-center mb-2">
+                    <small><i class="bi bi-lightning-fill text-warning"></i> Quick Login (Demo Accounts)</small>
+                </p>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary w-100" onclick="quickLogin('kaya.oguz')">
+                        <i class="bi bi-person-video3"></i><br>
+                        <small>Dr. Kaya Oğuz</small><br>
+                        <span class="badge bg-primary">Instructor</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-secondary w-100" onclick="quickLogin('sinan.sener')">
+                        <i class="bi bi-backpack"></i><br>
+                        <small>Sinan Mert Şener</small><br>
+                        <span class="badge bg-secondary">Student</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary w-100 btn-sm" onclick="quickLogin('kutluhan.erol')">
+                        <small>Dr. Kutluhan Erol</small>
+                        <span class="badge bg-primary">Instructor</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="quickLogin('ali.veli')">
+                        <small>Ali Veli</small>
+                        <span class="badge bg-secondary">Student</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer bg-light text-center py-3">
+            <small class="text-muted">
+                <i class="bi bi-shield-check text-success"></i>
+                Secured by IUE OAuth Service (Simulated)
+            </small>
+        </div>
+    </div>
+
+    <!-- Available Users Info -->
+    <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-header bg-dark text-white py-2">
+            <small><i class="bi bi-database"></i> Simulated User Database</small>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>EKOID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>kaya.oguz</code></td>
+                        <td>Doç. Dr. Kaya Oğuz</td>
+                        <td><span class="badge bg-primary">Instructor</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>kutluhan.erol</code></td>
+                        <td>Dr. Kutluhan Erol</td>
+                        <td><span class="badge bg-primary">Instructor</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>hamza.cekirdek</code></td>
+                        <td>Arş. Gör. Hamza Çekirdek</td>
+                        <td><span class="badge bg-primary">Instructor</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>sinan.sener</code></td>
+                        <td>Sinan Mert Şener</td>
+                        <td><span class="badge bg-secondary">Student</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>ali.veli</code></td>
+                        <td>Ali Veli</td>
+                        <td><span class="badge bg-secondary">Student</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function quickLogin(ekoid) {
+        document.getElementById('ekoidInput').value = ekoid;
+        document.getElementById('loginForm').submit();
+    }
+</script>

@@ -1,0 +1,354 @@
+@model SyllabusApp.Models.Syllabus
+
+@{
+    bool isInstructor = ViewBag.User.Role == "Instructor";
+    bool isHistory = ViewBag.IsHistory == true;
+    bool canEdit = isInstructor && !isHistory;
+    
+    // Null Check
+    if (Model.ProgramCompetencies == null) Model.ProgramCompetencies = new List<SyllabusApp.Models.ProgramCompetencyItem>();
+    if (Model.LearningOutcomes == null) Model.LearningOutcomes = new List<string>();
+    if (Model.WeeklyPlan == null) Model.WeeklyPlan = new List<SyllabusApp.Models.WeeklyItem>();
+    if (Model.Assessments == null) Model.Assessments = new List<SyllabusApp.Models.AssessmentItem>();
+    if (Model.WorkloadTable == null) Model.WorkloadTable = new List<SyllabusApp.Models.WorkloadItem>();
+}
+
+<style>
+    /* IUE TARZI CSS */
+    body { background-color: #ffffff; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    .iue-title-bar { border-bottom: 3px solid #f37021; margin-bottom: 20px; padding-bottom: 10px; }
+    .iue-title { color: #005eb8; font-weight: 800; font-size: 1.6rem; margin: 0; }
+    
+    .section-header { 
+        background-color: #f9f9f9; 
+        border-left: 6px solid #f37021; 
+        padding: 8px 15px; 
+        margin-top: 35px; 
+        margin-bottom: 10px; 
+        font-weight: 800; 
+        color: #333; 
+        font-size: 0.95rem; 
+        text-transform: uppercase;
+        border-top: 1px solid #eee;
+        border-right: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Tablolar */
+    .iue-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.9rem; table-layout: fixed; }
+    .iue-table th { background-color: #fcfcfc; border: 1px solid #ddd; padding: 10px; font-weight: 600; color: #444; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+    .iue-table td { border: 1px solid #ddd; padding: 8px; vertical-align: middle; overflow: hidden; }
+    
+    /* Inputlar */
+    .field-input { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px; color: inherit; font: inherit; resize: none; outline: none; }
+    
+    .editing .field-input { border: 1px solid #ced4da; background-color: #fff; border-radius: 3px; }
+    .editing .field-input:focus { border-color: #f37021; box-shadow: 0 0 0 2px rgba(243, 112, 33, 0.1); }
+    
+    /* --- DÜZELTME BAŞLANGICI: GİZLEME / GÖSTERME MANTIĞI --- */
+    
+    /* Normalde gizli olanlar */
+    .edit-only { display: none !important; }
+    
+    /* Edit modu açılınca: Genel elemanlar blok olur */
+    .editing .edit-only { display: block !important; }
+    
+    /* Edit modu açılınca: Tablo hücreleri ve başlıkları MUTLAKA table-cell olmalı (yoksa kayar) */
+    .editing td.edit-only, 
+    .editing th.edit-only { display: table-cell !important; }
+    
+    /* Normalde görünenler */
+    .view-only { display: block; }
+    
+    /* Edit modu açılınca gizlenenler */
+    .editing .view-only { display: none !important; }
+    
+    /* --- DÜZELTME BİTİŞİ --- */
+
+    .btn-add-header {
+        font-size: 0.75rem; padding: 2px 10px; background-color: white; border: 1px solid #28a745; color: #28a745; border-radius: 15px; text-transform: none; font-weight: bold;
+    }
+    .btn-add-header:hover { background-color: #28a745; color: white; }
+</style>
+
+@if (isHistory)
+{
+    <div class="alert alert-warning m-4 shadow-sm">
+        <strong>Archive Mode:</strong> Viewing version from @ViewBag.CommitDate. <a href="/Syllabus/Details?id=@Model.CourseCode" class="fw-bold text-dark">Go to Current</a>
+    </div>
+}
+
+<form id="mainForm" asp-action="UpdateInline" method="post" class="container-fluid px-4 mt-4 pb-5">
+    <input type="hidden" name="CourseCode" value="@Model.CourseCode" />
+    <input type="hidden" name="CourseName" value="@Model.CourseName" />
+
+    <div class="row">
+        <div class="col-lg-10">
+            
+            <div class="iue-title-bar d-flex justify-content-between align-items-end">
+                <h1 class="iue-title">@Model.CourseCode | @Model.CourseName</h1>
+                <span class="badge bg-secondary rounded-pill px-3 py-2 fs-6">@Model.Semester</span>
+            </div>
+
+            <table class="iue-table text-center">
+                <thead><tr><th>Code</th><th>Semester</th><th>Theory</th><th>Lab</th><th>Credit</th><th>ECTS</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">@Model.CourseCode</td>
+                        <td><input name="Semester" value="@Model.Semester" class="field-input text-center" readonly /></td>
+                        <td><input type="number" name="TheoryHours" value="@Model.TheoryHours" class="field-input text-center" readonly /></td>
+                        <td><input type="number" name="LabHours" value="@Model.LabHours" class="field-input text-center" readonly /></td>
+                        <td><input type="number" name="LocalCredit" value="@Model.LocalCredit" class="field-input text-center" readonly /></td>
+                        <td class="fw-bold text-primary"><input type="number" name="ECTS" value="@Model.ECTS" class="field-input text-center fw-bold text-primary" readonly /></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="iue-table mt-4">
+                <tbody>
+                    <tr><th width="20%">Prerequisites</th><td><input name="Prerequisites" value="@Model.Prerequisites" class="field-input" readonly /></td></tr>
+                    <tr><th>Language</th><td><input name="Language" value="@Model.Language" class="field-input" readonly /></td></tr>
+                    <tr><th>Type</th><td><input name="CourseType" value="@Model.CourseType" class="field-input" readonly /></td></tr>
+                    <tr><th>Level</th><td><input name="CourseLevel" value="@Model.CourseLevel" class="field-input" readonly /></td></tr>
+                    
+                    <tr><th>Coordinator</th><td><i class="bi bi-person-badge text-primary me-1"></i> <input name="CoordinatorEKOID" value="@Model.CoordinatorEKOID" class="field-input fw-bold text-primary d-inline-block w-75" readonly /></td></tr>
+                    <tr><th>Lecturer(s)</th><td><i class="bi bi-person-workspace text-primary me-1"></i> <input name="Lecturer" value="@Model.Lecturer" class="field-input fw-bold text-primary d-inline-block w-75" readonly /></td></tr>
+                    <tr><th>Assistant(s)</th><td><i class="bi bi-person text-primary me-1"></i> <input name="Assistant" value="@Model.Assistant" class="field-input fw-bold text-primary d-inline-block w-75" readonly /></td></tr>
+                    
+                    <tr><th>Teaching Methods</th><td><textarea name="TeachingMethods" class="field-input" rows="2" readonly>@Model.TeachingMethods</textarea></td></tr>
+                </tbody>
+            </table>
+
+            <div class="section-header"><span><i class="bi bi-bullseye me-2 text-iue-orange"></i> COURSE OBJECTIVES</span></div>
+            <div class="border p-2 mb-2">
+                <textarea name="Objectives" class="field-input" rows="3" readonly>@(string.IsNullOrEmpty(Model.Objectives) ? "-" : Model.Objectives)</textarea>
+            </div>
+
+            <div class="section-header">
+                <span><i class="bi bi-lightbulb me-2 text-iue-orange"></i> LEARNING OUTCOMES</span>
+                <button type="button" class="btn-add-header edit-only" onclick="addOutcome()"><i class="bi bi-plus-lg"></i> Add</button>
+            </div>
+            <table class="iue-table" id="outcomesTable">
+                <tbody>
+                    @if(Model.LearningOutcomes.Count > 0) {
+                        for (int i = 0; i < Model.LearningOutcomes.Count; i++) {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <input name="LearningOutcomes" value="@Model.LearningOutcomes[i]" class="field-input w-100" readonly />
+                                    </div>
+                                </td>
+                                <td style="width: 50px;" class="edit-only text-center"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td>
+                            </tr>
+                        }
+                    } else { <tr><td class="text-muted fst-italic p-2">-</td></tr> }
+                </tbody>
+            </table>
+
+            <div class="section-header"><span><i class="bi bi-file-text me-2 text-iue-orange"></i> COURSE DESCRIPTION</span></div>
+            <div class="border p-2 mb-2">
+                <textarea name="Description" class="field-input" rows="3" readonly>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</textarea>
+            </div>
+
+            <div class="section-header"><span><i class="bi bi-globe me-2 text-iue-orange"></i> SUSTAINABLE DEVELOPMENT GOALS</span></div>
+            <div class="border p-2 mb-2">
+                <textarea name="SustainableDevelopmentGoals" class="field-input" rows="1" readonly>@(string.IsNullOrEmpty(Model.SustainableDevelopmentGoals) ? "-" : Model.SustainableDevelopmentGoals)</textarea>
+            </div>
+
+            <div class="section-header">
+                <span><i class="bi bi-calendar3 me-2 text-iue-orange"></i> WEEKLY SUBJECTS</span>
+                <button type="button" class="btn-add-header edit-only" onclick="addWeek()"><i class="bi bi-plus-lg"></i> Add Week</button>
+            </div>
+            <table class="iue-table" id="weeklyTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;" class="text-center">#</th>
+                        <th>Topics</th>
+                        <th style="width: 30%;">Preparation</th>
+                        <th style="width: 50px;" class="edit-only text-center">X</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(Model.WeeklyPlan.Count > 0) {
+                        for (int i = 0; i < Model.WeeklyPlan.Count; i++) {
+                            <tr>
+                                <td class="text-center fw-bold"><input name="WeeklyPlan[@i].WeekNumber" value="@Model.WeeklyPlan[i].WeekNumber" class="field-input text-center" readonly /></td>
+                                <td><input name="WeeklyPlan[@i].Topics" value="@Model.WeeklyPlan[i].Topics" class="field-input" readonly /></td>
+                                <td><input name="WeeklyPlan[@i].Preparation" value="@Model.WeeklyPlan[i].Preparation" class="field-input" readonly /></td>
+                                <td class="edit-only text-center"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td>
+                            </tr>
+                        }
+                    } else { <tr><td colspan="4" class="text-center text-muted">-</td></tr> }
+                </tbody>
+            </table>
+
+            <div class="section-header"><span><i class="bi bi-book me-2 text-iue-orange"></i> RESOURCES</span></div>
+            <table class="iue-table">
+                <tbody>
+                    <tr><th width="20%">Textbooks</th><td><textarea name="Textbooks" class="field-input" rows="3" readonly>@string.Join("\n", Model.Textbooks)</textarea></td></tr>
+                    <tr><th>Readings</th><td><textarea name="SuggestedReadings" class="field-input" rows="3" readonly>@string.Join("\n", Model.SuggestedReadings)</textarea></td></tr>
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="section-header">
+                        <span><i class="bi bi-calculator me-2 text-iue-orange"></i> EVALUATION</span>
+                        <button type="button" class="btn-add-header edit-only" onclick="addAss()"><i class="bi bi-plus-lg"></i> Add</button>
+                    </div>
+                    <table class="iue-table text-center" id="assTable">
+                        <thead><tr><th>Activity</th><th>Count</th><th>%</th><th style="width: 50px;" class="edit-only">X</th></tr></thead>
+                        <tbody>
+                            @if(Model.Assessments.Count > 0) {
+                                for (int i = 0; i < Model.Assessments.Count; i++) {
+                                    <tr>
+                                        <td><input name="Assessments[@i].Activity" value="@Model.Assessments[i].Activity" class="field-input text-start" readonly /></td>
+                                        <td><input type="number" name="Assessments[@i].Count" value="@Model.Assessments[i].Count" class="field-input text-center" readonly /></td>
+                                        <td><input type="number" name="Assessments[@i].Percentage" value="@Model.Assessments[i].Percentage" class="field-input text-center" readonly /></td>
+                                        <td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot class="bg-light fw-bold"><tr><td>Total</td><td>@Model.Assessments.Sum(x=>x.Count)</td><td>@Model.Assessments.Sum(x=>x.Percentage)</td><td class="edit-only"></td></tr></tfoot>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="section-header">
+                        <span><i class="bi bi-hourglass-split me-2 text-iue-orange"></i> WORKLOAD</span>
+                        <button type="button" class="btn-add-header edit-only" onclick="addWork()"><i class="bi bi-plus-lg"></i> Add</button>
+                    </div>
+                    <table class="iue-table text-center" id="workTable">
+                        <thead><tr><th>Activity</th><th>Count</th><th>Hrs</th><th style="width: 50px;" class="edit-only">X</th></tr></thead>
+                        <tbody>
+                            @if(Model.WorkloadTable.Count > 0) {
+                                for (int i = 0; i < Model.WorkloadTable.Count; i++) {
+                                    <tr>
+                                        <td><input name="WorkloadTable[@i].Activity" value="@Model.WorkloadTable[i].Activity" class="field-input text-start" readonly /></td>
+                                        <td><input type="number" name="WorkloadTable[@i].Count" value="@Model.WorkloadTable[i].Count" class="field-input text-center" readonly /></td>
+                                        <td><input type="number" name="WorkloadTable[@i].Duration" value="@Model.WorkloadTable[i].Duration" class="field-input text-center" readonly /></td>
+                                        <td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot class="bg-light fw-bold"><tr><td colspan="2">Total Workload</td><td>@Model.WorkloadTable.Sum(x=>x.Workload)</td><td class="edit-only"></td></tr></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <span><i class="bi bi-diagram-3 me-2 text-iue-orange"></i> PROGRAM COMPETENCIES</span>
+                <button type="button" class="btn-add-header edit-only" onclick="addProgComp()"><i class="bi bi-plus-lg"></i> Add</button>
+            </div>
+            <table class="iue-table text-center" id="progCompTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th class="text-start">Outcome</th>
+                        <th style="width: 40px;">1</th>
+                        <th style="width: 40px;">2</th>
+                        <th style="width: 40px;">3</th>
+                        <th style="width: 40px;">4</th>
+                        <th style="width: 40px;">5</th>
+                        <th style="width: 50px;" class="edit-only">X</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(Model.ProgramCompetencies.Count > 0) {
+                        for(int i=0; i<Model.ProgramCompetencies.Count; i++) {
+                            <tr>
+                                <td class="fw-bold"><input name="ProgramCompetencies[@i].Id" value="@Model.ProgramCompetencies[i].Id" class="field-input text-center" readonly /></td>
+                                <td><input name="ProgramCompetencies[@i].Description" value="@Model.ProgramCompetencies[i].Description" class="field-input text-start" readonly /></td>
+                                
+                                <td><span class="view-only">@(Model.ProgramCompetencies[i].Level == 1 ? "X" : "")</span><input type="radio" name="ProgramCompetencies[@i].Level" value="1" class="edit-only mx-auto" @(Model.ProgramCompetencies[i].Level == 1 ? "checked" : "") /></td>
+                                <td><span class="view-only">@(Model.ProgramCompetencies[i].Level == 2 ? "X" : "")</span><input type="radio" name="ProgramCompetencies[@i].Level" value="2" class="edit-only mx-auto" @(Model.ProgramCompetencies[i].Level == 2 ? "checked" : "") /></td>
+                                <td><span class="view-only">@(Model.ProgramCompetencies[i].Level == 3 ? "X" : "")</span><input type="radio" name="ProgramCompetencies[@i].Level" value="3" class="edit-only mx-auto" @(Model.ProgramCompetencies[i].Level == 3 ? "checked" : "") /></td>
+                                <td><span class="view-only">@(Model.ProgramCompetencies[i].Level == 4 ? "X" : "")</span><input type="radio" name="ProgramCompetencies[@i].Level" value="4" class="edit-only mx-auto" @(Model.ProgramCompetencies[i].Level == 4 ? "checked" : "") /></td>
+                                <td><span class="view-only">@(Model.ProgramCompetencies[i].Level == 5 ? "X" : "")</span><input type="radio" name="ProgramCompetencies[@i].Level" value="5" class="edit-only mx-auto" @(Model.ProgramCompetencies[i].Level == 5 ? "checked" : "") /></td>
+                                
+                                <td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td>
+                            </tr>
+                        }
+                    } else { <tr><td colspan="8" class="text-center text-muted p-3">-</td></tr> }
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="col-lg-2">
+            <div class="card shadow-sm border-0 sticky-top" style="top:20px;">
+                <div class="card-header bg-dark text-white text-center py-2"><h6 class="mb-0"><i class="bi bi-tools"></i> Actions</h6></div>
+                <div class="card-body p-2 d-grid gap-2">
+                    
+                    <div class="view-actions view-only d-grid gap-2">
+                        <a href="/Syllabus/Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left-circle"></i> Back to Catalog</a>
+                        
+                        @if(canEdit) {
+                            <button type="button" class="btn btn-warning btn-sm fw-bold" onclick="enableEdit()">
+                                <i class="bi bi-pencil-square"></i> Edit Mode
+                            </button>
+                            <a href="/Syllabus/Delete?id=@Model.CourseCode" class="btn btn-danger btn-sm" onclick="return confirm('Delete?');"><i class="bi bi-trash-fill"></i> Delete</a>
+                        }
+                        
+                        <hr class="my-1">
+                        <a href="/Syllabus/History?id=@Model.CourseCode" class="btn btn-info text-white btn-sm"><i class="bi bi-clock-history"></i> @(ViewBag.User.Role == "Student" ? "Archive" : "History")</a>
+                    </div>
+
+                    <div class="edit-actions edit-only">
+                        <div class="alert alert-warning p-2 small mb-2 text-center border-warning">
+                            <i class="bi bi-pencil-fill"></i> Editing Active
+                        </div>
+                        
+                        <label class="small fw-bold text-danger">Commit Message*</label>
+                        <textarea name="commitMessage" class="form-control form-control-sm mb-2" rows="3" placeholder="Description of changes..." required></textarea>
+                        
+                        <button type="submit" class="btn btn-success btn-sm w-100 mb-2 fw-bold"><i class="bi bi-check-lg"></i> Save & Commit</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="cancelEdit()"><i class="bi bi-x-lg"></i> Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function enableEdit() {
+        document.getElementById('mainForm').classList.add('editing');
+        document.querySelectorAll('.field-input').forEach(el => el.removeAttribute('readonly'));
+        
+        document.querySelectorAll('.view-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('table tbody tr td.text-muted').forEach(el => el.closest('tr').remove());
+    }
+
+    function cancelEdit() { location.reload(); }
+    function delRow(btn) { btn.closest('tr').remove(); }
+
+    function addOutcome() {
+        document.querySelector('#outcomesTable tbody').insertAdjacentHTML('beforeend', `<tr><td><div class="d-flex"><span class="me-2 text-success"><i class="bi bi-plus-circle"></i></span><input name="LearningOutcomes" class="field-input" placeholder="New Outcome" /></div></td><td class="edit-only text-center"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td></tr>`);
+    }
+    function addWeek() {
+        let i = document.querySelectorAll('#weeklyTable tbody tr').length;
+        document.querySelector('#weeklyTable tbody').insertAdjacentHTML('beforeend', `<tr><td class="text-center"><input name="WeeklyPlan[${i}].WeekNumber" value="${i+1}" class="field-input text-center"/></td><td><input name="WeeklyPlan[${i}].Topics" class="field-input" placeholder="Topic"/></td><td><input name="WeeklyPlan[${i}].Preparation" class="field-input" placeholder="Prep"/></td><td class="edit-only text-center"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td></tr>`);
+    }
+    function addAss() {
+        let i = document.querySelectorAll('#assTable tbody tr').length;
+        document.querySelector('#assTable tbody').insertAdjacentHTML('beforeend', `<tr><td><input name="Assessments[${i}].Activity" class="field-input" placeholder="Name"/></td><td><input type="number" name="Assessments[${i}].Count" value="1" class="field-input text-center"/></td><td><input type="number" name="Assessments[${i}].Percentage" value="0" class="field-input text-center"/></td><td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td></tr>`);
+    }
+    function addWork() {
+        let i = document.querySelectorAll('#workTable tbody tr').length;
+        document.querySelector('#workTable tbody').insertAdjacentHTML('beforeend', `<tr><td><input name="WorkloadTable[${i}].Activity" class="field-input" placeholder="Activity"/></td><td><input type="number" name="WorkloadTable[${i}].Count" value="1" class="field-input text-center"/></td><td><input type="number" name="WorkloadTable[${i}].Duration" value="1" class="field-input text-center"/></td><td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td></tr>`);
+    }
+    function addProgComp() {
+        let i = document.querySelectorAll('#progCompTable tbody tr').length;
+        let row = `<tr><td class="fw-bold"><input name="ProgramCompetencies[${i}].Id" value="${i+1}" class="field-input text-center"/></td><td><input name="ProgramCompetencies[${i}].Description" class="field-input" placeholder="Desc"/></td><td><input type="radio" name="ProgramCompetencies[${i}].Level" value="1" class="mx-auto d-block"/></td><td><input type="radio" name="ProgramCompetencies[${i}].Level" value="2" class="mx-auto d-block"/></td><td><input type="radio" name="ProgramCompetencies[${i}].Level" value="3" class="mx-auto d-block"/></td><td><input type="radio" name="ProgramCompetencies[${i}].Level" value="4" class="mx-auto d-block"/></td><td><input type="radio" name="ProgramCompetencies[${i}].Level" value="5" class="mx-auto d-block"/></td><td class="edit-only"><button type="button" onclick="delRow(this)" class="btn btn-sm btn-danger py-0 px-1">X</button></td></tr>`;
+        document.querySelector('#progCompTable tbody').insertAdjacentHTML('beforeend', row);
+    }
+</script>

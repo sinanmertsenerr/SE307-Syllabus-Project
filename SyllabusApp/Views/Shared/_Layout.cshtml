@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Syllabus System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; letter-spacing: 1px; }
+        .card { border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow mb-3 py-3">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand" asp-controller="Syllabus" asp-action="Index">
+                    <i class="bi bi-journal-code text-warning"></i> Syllabus Management
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1"></ul>
+                    
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        @if (ViewBag.User != null)
+                        {
+                            <li class="nav-item me-2">
+                                <a class="btn btn-outline-warning btn-sm" asp-controller="Syllabus" asp-action="Subscriptions">
+                                    <i class="bi bi-bell-fill"></i> Subscriptions
+                                </a>
+                            </li>
+                            <li class="nav-item me-3">
+                                <span class="text-white">
+                                    <i class="bi bi-person-circle"></i> @ViewBag.User.FullName 
+                                    <span class="badge bg-secondary ms-1">@ViewBag.User.Role</span>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-danger btn-sm" asp-controller="Syllabus" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            @if (TempData["NotifyMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show m-3 shadow" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> 
+                    <strong>Success!</strong> Syllabus updated.
+                    <br>
+                    <small class="text-muted"><i class="bi bi-envelope"></i> @TempData["NotifyMessage"]</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+@model List<SyllabusApp.Models.SyllabusCommit>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark">
+            @if (ViewBag.User.Role == "Student") { <span><i class="bi bi-archive-fill text-primary"></i> Archive</span> } 
+            else { <span><i class="bi bi-clock-history text-primary"></i> History</span> }
+            <small class="text-muted fs-6">(@ViewBag.CourseCode)</small>
+        </h3>
+        <a href="/Syllabus/Details?id=@ViewBag.CourseCode" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left-circle"></i> Back</a>
+    </div>
+    <div class="card shadow-sm border-0"><div class="card-body p-0"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr>
+        @if (ViewBag.User.Role == "Student") { <th>Academic Year / Version</th> }
+        else { <th>Date</th><th>Author</th><th>Message</th> }
+        <th class="text-center">Action</th></tr></thead><tbody>
+        @foreach(var c in Model) {
+            <tr>
+                @if (ViewBag.User.Role == "Student") {
+                    <td><div class="d-flex align-items-center"><div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-calendar-check text-success fs-5"></i></div><div><span class="fw-bold text-dark d-block">@c.Timestamp.ToString("yyyy") Final</span><small class="text-muted">@c.Timestamp.ToString("dd MMMM yyyy")</small></div></div></td>
+                } else {
+                    <td class="fw-bold">@c.Timestamp.ToString("dd.MM.yyyy HH:mm")</td><td>@c.AuthorName</td><td class="text-muted text-truncate" style="max-width:200px">@c.Message</td>
+                }
+                <td class="text-center"><a href="/Syllabus/ViewCommit?courseCode=@ViewBag.CourseCode&commitId=@c.CommitID" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye-fill"></i> View</a></td>
+            </tr>
+        }
+    </tbody></table></div></div>
+</div>

@@ -1,0 +1,188 @@
+{
+  "CourseCode": "SE 307",
+  "CourseName": "Concepts of Object-Oriented Programming",
+  "Semester": "Fall",
+  "TheoryHours": 2,
+  "LabHours": 2,
+  "LocalCredit": 3,
+  "ECTS": 7,
+  "Prerequisites": "SE 116",
+  "Language": "English",
+  "CourseType": "Required",
+  "CourseLevel": "First Cycle",
+  "TeachingMethods": "Lectures, Laboratory, Project, Discussion",
+  "CoordinatorEKOID": "Asst. Prof. Dr. Kutluhan Erol",
+  "Lecturer": "Doç. Dr Kaya Oğuz",
+  "Assistant": "Res. Asst. Hamza Cekirdek",
+  "Objectives": "This course teaches students the basic concepts of object-oriented programming using the C# programming language.",
+  "Description": "This course is a conceptual and application-based introduction to object-oriented programming using the widely used C# programming language. Basic concepts associated with object-oriented programming (e.g. objects, classes, protocol, hierarchy, inheritance, wrapping, polymorphism, code reuse, interfaces, interoperability, etc.) will be introduced using the C# Programming language and explained with examples.",
+  "SustainableDevelopmentGoals": "-",
+  "LearningOutcomes": [
+    "Explain the basic principles of the use of abstraction",
+    "Explain the basic principles of object-oriented design workflow",
+    "Write object-oriented programs using the C# programming language",
+    "Apply the concept of inheritance in object-oriented design",
+    "Apply the concepts of polymorphism and abstract classes as part of object-oriented design"
+  ],
+  "WeeklyPlan": [
+    {
+      "WeekNumber": 1,
+      "Topics": "Programming Paradigms",
+      "Preparation": "Weisfeld Ch. 1-4"
+    },
+    {
+      "WeekNumber": 2,
+      "Topics": "C# Fundamentals, Classes & Objects, Memory Models",
+      "Preparation": "Textbook Ch. 5"
+    },
+    {
+      "WeekNumber": 3,
+      "Topics": "Inheritance & Polymorphism",
+      "Preparation": "Textbook Ch. 6"
+    },
+    {
+      "WeekNumber": 4,
+      "Topics": "Abstract Classes and Interfaces",
+      "Preparation": "Textbook Ch. 8"
+    },
+    {
+      "WeekNumber": 5,
+      "Topics": "Generic Programming",
+      "Preparation": "Textbook Ch. 10"
+    },
+    {
+      "WeekNumber": 6,
+      "Topics": "SOLID Principles – Part 1",
+      "Preparation": "Weisfeld Ch. 7-8"
+    },
+    {
+      "WeekNumber": 7,
+      "Topics": "SOLID Principles – Part 2",
+      "Preparation": "Weisfeld Ch. 9"
+    },
+    {
+      "WeekNumber": 8,
+      "Topics": "Midterm Exam",
+      "Preparation": "-"
+    },
+    {
+      "WeekNumber": 9,
+      "Topics": "Design Patterns: Creational",
+      "Preparation": "Notes"
+    },
+    {
+      "WeekNumber": 10,
+      "Topics": "Design Patterns: Structural",
+      "Preparation": "Notes"
+    },
+    {
+      "WeekNumber": 11,
+      "Topics": "Design Patterns: Behavioral",
+      "Preparation": "Notes"
+    },
+    {
+      "WeekNumber": 12,
+      "Topics": "Creating Object Models with UML",
+      "Preparation": "Weisfeld Ch. 10"
+    },
+    {
+      "WeekNumber": 13,
+      "Topics": "Unit Testing & TDD",
+      "Preparation": "Notes"
+    },
+    {
+      "WeekNumber": 14,
+      "Topics": "Project Presentations",
+      "Preparation": "-"
+    },
+    {
+      "WeekNumber": 15,
+      "Topics": "Project Presentations",
+      "Preparation": "-"
+    },
+    {
+      "WeekNumber": 16,
+      "Topics": "Final Exam",
+      "Preparation": "-"
+    }
+  ],
+  "Textbooks": [
+    "The Object-Oriented Thought Process, Matt Weisfeld, Addison-Wesley",
+    "C# 10 and .NET 6 – Modern Cross-Platform Development, Mark J. Price"
+  ],
+  "SuggestedReadings": [
+    "Clean Code: A Handbook of Agile Software Craftsmanship, Robert C. Martin"
+  ],
+  "Assessments": [
+    {
+      "Activity": "Midterm Exam",
+      "Count": 1,
+      "Percentage": 30
+    },
+    {
+      "Activity": "Lab / Application",
+      "Count": 5,
+      "Percentage": 20
+    },
+    {
+      "Activity": "Project / Presentation",
+      "Count": 1,
+      "Percentage": 15
+    },
+    {
+      "Activity": "Final Exam",
+      "Count": 1,
+      "Percentage": 35
+    }
+  ],
+  "WorkloadTable": [
+    {
+      "Activity": "Lectures",
+      "Count": 16,
+      "Duration": 2,
+      "Workload": 32
+    },
+    {
+      "Activity": "Laboratory / Application",
+      "Count": 16,
+      "Duration": 2,
+      "Workload": 32
+    },
+    {
+      "Activity": "Study Hours (Out of Class)",
+      "Count": 16,
+      "Duration": 3,
+      "Workload": 48
+    },
+    {
+      "Activity": "Midterm Preparation",
+      "Count": 1,
+      "Duration": 20,
+      "Workload": 20
+    },
+    {
+      "Activity": "Project / Assignment",
+      "Count": 1,
+      "Duration": 25,
+      "Workload": 25
+    },
+    {
+      "Activity": "Final Preparation",
+      "Count": 1,
+      "Duration": 25,
+      "Workload": 25
+    }
+  ],
+  "ProgramCompetencies": [
+    {
+      "Id": 1,
+      "Description": "Ability to apply knowledge of mathematics, science, and engineering",
+      "Level": 5
+    },
+    {
+      "Id": 2,
+      "Description": "Ability to design and conduct experiments, as well as to analyze and interpret data",
+      "Level": 3
+    }
+  ]
+}

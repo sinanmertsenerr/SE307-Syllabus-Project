@@ -1,0 +1,171 @@
+@model List<SyllabusApp.Models.Subscription>
+
+@{
+    ViewData["Title"] = "Notification Subscriptions";
+    var allCourses = ViewBag.AllCourses as List<string> ?? new List<string>();
+}
+
+<div class="container mt-4" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">
+                <i class="bi bi-bell-fill text-warning"></i> Notification Subscriptions
+            </h2>
+            <p class="text-muted mb-0">
+                Subscribe to courses to receive SMS and Email notifications when changes are made.
+            </p>
+        </div>
+        <a href="/Syllabus/Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Catalog
+        </a>
+    </div>
+
+    @if (TempData["SubscriptionMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SubscriptionMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Add New Subscription -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Subscription</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Subscribe" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Course/Pattern</label>
+                            <select name="pattern" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <optgroup label="All Courses in Department">
+                                    <option value="SE*">SE* (All Software Engineering)</option>
+                                    <option value="CE*">CE* (All Computer Engineering)</option>
+                                    <option value="*">* (All Courses)</option>
+                                </optgroup>
+                                <optgroup label="Specific Courses">
+                                    @foreach (var course in allCourses)
+                                    {
+                                        <option value="@course">@course</option>
+                                    }
+                                </optgroup>
+                            </select>
+                            <div class="form-text">
+                                Use patterns like "SE*" to subscribe to all SE courses.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Notification Methods</label>
+                            <div class="form-check">
+                                <input type="checkbox" name="notifyEmail" value="true" class="form-check-input" id="emailCheck" checked>
+                                <label class="form-check-label" for="emailCheck">
+                                    <i class="bi bi-envelope text-warning"></i> Email Notifications
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="notifySMS" value="true" class="form-check-input" id="smsCheck">
+                                <label class="form-check-label" for="smsCheck">
+                                    <i class="bi bi-phone text-success"></i> SMS Notifications
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-bell-fill"></i> Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted"><i class="bi bi-info-circle"></i> How it works</h6>
+                    <ul class="small mb-0">
+                        <li>When a syllabus is updated, subscribers are notified</li>
+                        <li>Use <code>SE*</code> to match all SE courses</li>
+                        <li>Use <code>*</code> to receive all notifications</li>
+                        <li>SMS and Email are simulated (console output)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Subscriptions -->
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Your Subscriptions</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Count == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-bell-slash" style="font-size: 3rem;"></i>
+                            <p class="mt-2">You have no subscriptions yet.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Pattern</th>
+                                    <th class="text-center">Email</th>
+                                    <th class="text-center">SMS</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var sub in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary fs-6">@sub.CourseCodePattern</span>
+                                            <br>
+                                            <small class="text-muted">Added: @sub.CreatedAt.ToString("dd MMM yyyy")</small>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (sub.NotifyByEmail)
+                                            {
+                                                <i class="bi bi-envelope-fill text-warning fs-5"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-envelope text-muted"></i>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (sub.NotifyBySMS)
+                                            {
+                                                <i class="bi bi-phone-fill text-success fs-5"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-phone text-muted"></i>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <form asp-action="Unsubscribe" method="post" style="display: inline;">
+                                                <input type="hidden" name="subscriptionId" value="@sub.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Remove this subscription?');">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
